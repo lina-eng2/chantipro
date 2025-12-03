@@ -1,0 +1,26 @@
+chantier-app/
+│  server.js
+│  package.json
+│  .env
+│
+├── db/
+│     db.js
+│
+├── controllers/
+│     authController.js
+│     projectController.js
+│
+├── middleware/
+│     authMiddleware.js
+│
+├── routes/
+│     authRoutes.js
+│     projectRoutes.js
+│
+└── public/
+      login.html
+      index.html
+      project.html
+      confidentialite.html
+      style.css
+      app.js

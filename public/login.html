@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Connexion - Gestion de chantiers</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="login">
+  <header>
+    <h1>Plateforme de gestion de chantiers</h1>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Connexion</h2>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Mot de passe</label>
+          <input type="password" id="login-password" required>
+        </div>
+
+        <button type="submit">Se connecter</button>
+        <p id="login-message" class="message"></p>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Créer un compte</h2>
+      <p>Pour un vrai usage, la création de compte pourrait être réservée à l’administrateur. Ici, c’est simplifié pour le projet.</p>
+      <form id="register-form">
+        <div class="form-group">
+          <label for="register-email">Email</label>
+          <input type="email" id="register-email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="register-password">Mot de passe</label>
+          <input type="password" id="register-password" required>
+        </div>
+
+        <div class="form-group">
+          <label for="register-role">Rôle</label>
+          <select id="register-role">
+            <option value="MOA">Maître d'Ouvrage (MOA)</option>
+            <option value="MOE">Maître d'Œuvre (MOE)</option>
+            <option value="Architecte">Architecte</option>
+            <option value="BET">BET</option>
+          </select>
+        </div>
+
+        <button type="submit">Créer le compte</button>
+        <p id="register-message" class="message"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 - Application de gestion de chantiers</p>
+    <a href="/confidentialite">Politique de confidentialité</a>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Politique de confidentialité</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="confidentialite">
+  <header>
+    <div class="header-left">
+      <h1>Politique de confidentialité</h1>
+    </div>
+    <div class="header-right">
+      <!-- on peut afficher l’utilisateur si connecté, sinon rien -->
+      <span id="current-user-email"></span>
+    </div>
+    <nav>
+      <a href="/dashboard">Tableau de bord</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="card">
+      <p><em>Dernière mise à jour : 2 décembre 2025</em></p>
+
+      <h2>1. Qui sommes-nous ?</h2>
+      <p>
+        La plateforme <strong>[Nom de la plateforme]</strong> est une application web de gestion de projets de construction.
+        Elle permet au Maître d’Ouvrage (MOA) et aux intervenants (architectes, bureaux d’études, etc.)
+        de centraliser les documents, suivre l’avancement et collaborer sur un chantier.
+      </p>
+
+      <h2>2. Quelles données collectons-nous ?</h2>
+      <p>Nous collectons uniquement les données nécessaires au fonctionnement de la plateforme :</p>
+      <ul>
+        <li>Données de compte : email, mot de passe (stocké sous forme hachée), rôle (MOA, MOE, etc.).</li>
+        <li>Données liées aux projets : nom du projet, localisation, type de construction, surface, budget prévisionnel.</li>
+        <li>Éventuellement, dans une version avancée : journaux de connexion et actions réalisées.</li>
+      </ul>
+
+      <h2>3. Pourquoi utilisons-nous ces données ?</h2>
+      <p>Les données sont utilisées pour :</p>
+      <ul>
+        <li>Créer et gérer les projets de construction associés à chaque utilisateur.</li>
+        <li>Assurer la traçabilité des projets (date, auteur, statut).</li>
+        <li>Garantir la sécurité des accès (authentification, autorisation).</li>
+      </ul>
+
+      <h2>4. Base légale du traitement</h2>
+      <p>
+        Dans un contexte réel, les traitements seraient fondés sur l’exécution d’un contrat et l’intérêt légitime
+        (sécurisation et amélioration du service). Dans ce projet, l’usage est démonstratif/prototypage.
+      </p>
+
+      <h2>5. Conservation des données</h2>
+      <p>
+        Les données sont stockées dans une base PostgreSQL. Dans une mise en production, des règles précises de durée de conservation
+        seraient définies (archivage des projets, suppression des comptes inactifs, etc.).
+      </p>
+
+      <h2>6. Sécurité</h2>
+      <p>
+        Les mots de passe sont stockés de manière hachée (bcrypt). L’accès aux routes de l’API est protégé
+        par des jetons (JWT). D’autres mesures (chiffrement, sauvegardes, pare-feu) peuvent être ajoutées dans une version ultérieure.
+      </p>
+
+      <h2>7. Vos droits</h2>
+      <p>
+        Dans une version déployée dans un contexte réel, les utilisateurs disposeraient des droits d’accès,
+        de rectification, d’effacement et d’opposition, conformément au RGPD.
+      </p>
+
+      <h2>8. Contact</h2>
+      <p>
+        Pour toute question concernant cette politique de confidentialité, vous pouvez contacter :
+        <strong>[Ton nom / ton e-mail professionnel]</strong>.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 - Application de gestion de chantiers</p>
+    <a href="/confidentialite">Politique de confidentialité</a>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

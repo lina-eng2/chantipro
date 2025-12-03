@@ -1,0 +1,138 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f4f4f4;
+  color: #333;
+}
+
+header {
+  background: #1f4e79;
+  color: #fff;
+  padding: 1rem 2rem;
+}
+
+header h1 {
+  margin: 0;
+}
+
+.header-left {
+  display: inline-block;
+}
+
+.header-right {
+  float: right;
+  margin-top: 0.3rem;
+}
+
+.header-right span {
+  margin-right: 0.5rem;
+}
+
+nav {
+  margin-top: 0.5rem;
+  clear: both;
+}
+
+nav a {
+  color: #fff;
+  margin-right: 1rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+main {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.card {
+  background: #fff;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+h2 {
+  margin-top: 0;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: bold;
+}
+
+input, select {
+  width: 100%;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+button {
+  background: #1f4e79;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #163858;
+}
+
+.btn-secondary {
+  background: #eee;
+  color: #333;
+}
+
+.btn-secondary:hover {
+  background: #ddd;
+}
+
+#projects-list .project-item {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ddd;
+}
+
+#projects-list .project-item:last-child {
+  border-bottom: none;
+}
+
+.project-item a {
+  color: #1f4e79;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.project-item a:hover {
+  text-decoration: underline;
+}
+
+.message {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+footer {
+  margin-top: 2rem;
+  padding: 1rem 2rem;
+  background: #eee;
+  text-align: center;
+}
+
+footer a {
+  color: #1f4e79;
+  text-decoration: none;
+  margin-left: 0.5rem;
+}

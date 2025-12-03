@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Détail du projet - Gestion de chantiers</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="project">
+  <header>
+    <div class="header-left">
+      <h1>Détail du projet</h1>
+    </div>
+    <div class="header-right">
+      <span id="current-user-email"></span>
+      <button type="button" class="btn-secondary" onclick="logout()">Déconnexion</button>
+    </div>
+    <nav>
+      <a href="/dashboard">Retour au tableau de bord</a>
+      <a href="/confidentialite">Politique de confidentialité</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2 id="project-name">Chargement...</h2>
+      <p><strong>ID :</strong> <span id="project-id"></span></p>
+      <p><strong>Localisation :</strong> <span id="project-location"></span></p>
+      <p><strong>Type :</strong> <span id="project-type"></span></p>
+      <p><strong>Surface :</strong> <span id="project-surface"></span> m²</p>
+      <p><strong>Budget :</strong> <span id="project-budget"></span> €</p>
+      <p><strong>Statut :</strong> <span id="project-status"></span></p>
+      <p><strong>Date de création :</strong> <span id="project-createdAt"></span></p>
+    </section>
+
+    <section class="card">
+      <h2>Prochaines étapes possibles</h2>
+      <ul>
+        <li>Inviter les intervenants (MOE, architecte, BET, etc.).</li>
+        <li>Déposer les plans (PDF, DWG).</li>
+        <li>Préparer les documents pour le dépôt administratif.</li>
+      </ul>
+      <p>
+        Ces fonctionnalités pourront être ajoutées dans une version suivante
+        (gestion des rôles, documents, workflow BTP marocain, etc.).
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 - Application de gestion de chantiers</p>
+    <a href="/confidentialite">Politique de confidentialité</a>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
