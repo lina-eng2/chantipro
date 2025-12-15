@@ -2,55 +2,109 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Détail du projet - Gestion de chantiers</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Détail du projet - ChantiPro</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body data-page="project">
-  <header>
-    <div class="header-left">
-      <h1>Détail du projet</h1>
-    </div>
-    <div class="header-right">
-      <span id="current-user-email"></span>
-      <button type="button" class="btn-secondary" onclick="logout()">Déconnexion</button>
-    </div>
-    <nav>
-      <a href="/dashboard">Retour au tableau de bord</a>
-      <a href="/confidentialite">Politique de confidentialité</a>
-    </nav>
-  </header>
-
-  <main>
-    <section class="card">
-      <h2 id="project-name">Chargement...</h2>
-      <p><strong>ID :</strong> <span id="project-id"></span></p>
-      <p><strong>Localisation :</strong> <span id="project-location"></span></p>
-      <p><strong>Type :</strong> <span id="project-type"></span></p>
-      <p><strong>Surface :</strong> <span id="project-surface"></span> m²</p>
-      <p><strong>Budget :</strong> <span id="project-budget"></span> €</p>
-      <p><strong>Statut :</strong> <span id="project-status"></span></p>
-      <p><strong>Date de création :</strong> <span id="project-createdAt"></span></p>
-    </section>
-
-    <section class="card">
-      <h2>Prochaines étapes possibles</h2>
-      <ul>
-        <li>Inviter les intervenants (MOE, architecte, BET, etc.).</li>
-        <li>Déposer les plans (PDF, DWG).</li>
-        <li>Préparer les documents pour le dépôt administratif.</li>
-      </ul>
-      <p>
-        Ces fonctionnalités pourront être ajoutées dans une version suivante
-        (gestion des rôles, documents, workflow BTP marocain, etc.).
-      </p>
-    </section>
-  </main>
-
-  <footer>
-    <p>&copy; 2025 - Application de gestion de chantiers</p>
+<header>
+  <div class="header-left">
+    <h1>Détail du projet</h1>
+  </div>
+  <div class="header-right">
+    <span id="current-user-email"></span>
+    <button type="button" class="btn-secondary" onclick="logout()">Déconnexion</button>
+  </div>
+  <nav>
+    <a href="/dashboard">Tableau de bord</a>
     <a href="/confidentialite">Politique de confidentialité</a>
-  </footer>
+  </nav>
+</header>
 
-  <script src="app.js"></script>
+<main>
+  <!-- Carte d’infos projet -->
+  <section class="card">
+    <h2 id="project-name">Nom du projet</h2>
+    <p><strong>ID :</strong> <span id="project-id"></span></p>
+    <p><strong>Localisation :</strong> <span id="project-location"></span></p>
+    <p><strong>Type :</strong> <span id="project-type"></span></p>
+    <p><strong>Surface :</strong> <span id="project-surface"></span> m²</p>
+    <p><strong>Budget :</strong> <span id="project-budget"></span> €</p>
+    <p><strong>Statut :</strong> <span id="project-status"></span></p>
+    <p><strong>Date de création :</strong> <span id="project-created-at"></span></p>
+
+    <!-- ⭐ Bouton pour marquer comme terminé -->
+    <button type="button" class="btn-secondary" id="mark-complete-btn">
+      Marquer le projet comme terminé
+    </button>
+  </section>
+
+  <!-- Formulaire de mise à jour pour le MOA -->
+  <section class="card">
+    <h2>Modifier le projet (MOA)</h2>
+    <p class="hint">
+      Cette section permet au Maître d’Ouvrage de mettre à jour les informations du projet
+      et d’indiquer si le projet est toujours en cours ou déjà complet.
+    </p>
+    <form id="edit-project-form">
+      <div class="form-group">
+        <label for="edit-name">Nom du projet</label>
+        <input type="text" id="edit-name" name="edit-name" required />
+      </div>
+
+      <div class="form-group">
+        <label for="edit-location">Localisation</label>
+        <input type="text" id="edit-location" name="edit-location" required />
+      </div>
+
+      <div class="form-group">
+        <label for="edit-type">Type de construction</label>
+        <input type="text" id="edit-type" name="edit-type" placeholder="Ex : Villa, Immeuble R+3..." />
+      </div>
+
+      <div class="form-group">
+        <label for="edit-surface">Surface (m²)</label>
+        <input type="number" id="edit-surface" name="edit-surface" min="0" />
+      </div>
+
+      <div class="form-group">
+        <label for="edit-budget">Budget prévisionnel (€)</label>
+        <input type="number" id="edit-budget" name="edit-budget" min="0" />
+      </div>
+
+      <div class="form-group">
+        <label for="edit-status">Statut du projet</label>
+        <select id="edit-status" name="edit-status">
+          <option value="Brouillon">Brouillon</option>
+          <option value="En cours" selected>En cours</option>
+          <option value="Complet">Complet</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn-primary">Enregistrer les modifications</button>
+      <p id="edit-message" class="form-message"></p>
+    </form>
+  </section>
+
+  <!-- Section explicative -->
+  <section class="card">
+    <h2>Prochaines étapes possibles</h2>
+    <ul>
+      <li>Inviter les intervenants (architecte, BET, etc.).</li>
+      <li>Déposer les plans (PDF, DWG).</li>
+      <li>Préparer les documents pour le dépôt administratif.</li>
+    </ul>
+    <p>
+      Ces fonctionnalités pourront être ajoutées dans une version suivante
+      (gestion des rôles, documents, workflow BTP marocain, etc.).
+    </p>
+  </section>
+</main>
+
+<footer>
+  <p>&copy; 2025 - ChantiPro</p>
+  <a href="/confidentialite">Politique de confidentialité</a>
+</footer>
+
+<script src="/app.js"></script>
 </body>
 </html>

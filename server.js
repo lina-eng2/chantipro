@@ -34,6 +34,10 @@ app.get('/confidentialite', (req, res) => {
 
 app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
 
 // -------- Start server ----------
 const PORT = process.env.PORT || 3000;

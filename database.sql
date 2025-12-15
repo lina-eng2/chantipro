@@ -1,3 +1,7 @@
+-- On supprime d'abord les tables si elles existent (pour une création initiale en local)
+DROP TABLE IF EXISTS projects;
+DROP TABLE IF EXISTS users;
+
 -- Table des utilisateurs
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
@@ -16,6 +20,6 @@ CREATE TABLE projects (
   type VARCHAR(100),
   surface NUMERIC,
   budget NUMERIC,
-  status VARCHAR(50) DEFAULT 'Brouillon',
+  status VARCHAR(50) DEFAULT 'En cours', -- ⭐ statut par défaut
   created_at TIMESTAMP DEFAULT NOW()
 );

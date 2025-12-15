@@ -136,3 +136,46 @@ footer a {
   text-decoration: none;
   margin-left: 0.5rem;
 }
+
+.subtitle {
+  font-size: 1rem;
+  color: #e0e0e0;
+  margin-top: -10px;
+}
+
+/* === HEADER BRANDING === */
+.header-top {
+  display: flex;
+  justify-content: space-between; /* Titre à gauche, lien à droite */
+  align-items: center;
+  background-color: #194b75; /* bleu foncé */
+  color: white;
+  padding: 15px 25px;
+}
+
+/* Bloc du titre + sous titre */
+.brand h1 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+/* Espace sous le titre */
+.brand .subtitle {
+  margin-top: 5px;    /* ⭐ petit espace demandé */
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* === NAVIGATION === */
+.header-nav a {
+  color: white;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.header-nav a:hover {
+  text-decoration: underline;
+}

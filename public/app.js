@@ -1,8 +1,6 @@
-// -------- Utils généraux --------
-function getCurrentPage() {
-  const body = document.querySelector('body');
-  return body ? body.getAttribute('data-page') : null;
-}
+// =====================
+// Utilitaires généraux
+// =====================
 
 function getToken() {
   return localStorage.getItem('token');
@@ -12,53 +10,41 @@ function setToken(token) {
   localStorage.setItem('token', token);
 }
 
-function setCurrentUser(user) {
-  localStorage.setItem('currentUser', JSON.stringify(user));
+function clearToken() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('currentUser');
 }
 
 function getCurrentUser() {
   const raw = localStorage.getItem('currentUser');
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
+  return raw ? JSON.parse(raw) : null;
+}
+
+function setCurrentUser(user) {
+  localStorage.setItem('currentUser', JSON.stringify(user));
 }
 
 function logout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('currentUser');
+  clearToken();
   window.location.href = '/';
 }
 
-// Afficher l’email de l’utilisateur connecté dans le header (si présent)
-function displayCurrentUserEmail() {
+// Affiche l’email dans le header si connecté
+function updateHeaderUserEmail() {
   const span = document.getElementById('current-user-email');
   if (!span) return;
   const user = getCurrentUser();
-  if (user && user.email) {
-    span.textContent = user.email + (user.role ? ' (' + user.role + ')' : '');
-  } else {
-    span.textContent = '';
-  }
+  span.textContent = user ? user.email : '';
 }
 
-// Forcer la connexion pour certaines pages
-function requireLogin() {
-  const token = getToken();
-  if (!token) {
-    window.location.href = '/';
-    return null;
-  }
-  return token;
-}
+// =====================
+// Page LOGIN
+// =====================
 
-// -------- LOGIN / REGISTER --------
-function initLoginForm() {
+function initLoginPage() {
   const loginForm = document.getElementById('login-form');
-  const loginMsg = document.getElementById('login-message');
   const registerForm = document.getElementById('register-form');
+  const loginMsg = document.getElementById('login-message');
   const registerMsg = document.getElementById('register-message');
 
   if (loginForm) {
@@ -76,14 +62,12 @@ function initLoginForm() {
           body: JSON.stringify({ email, password })
         });
 
-        const data = await res.json();
-
         if (!res.ok) {
-          loginMsg.textContent = data.error || 'Erreur de connexion.';
-          loginMsg.style.color = 'red';
-          return;
+          const error = await res.json().catch(() => ({}));
+          throw new Error(error.error || 'Erreur de connexion');
         }
 
+        const data = await res.json();
         setToken(data.token);
         setCurrentUser(data.user);
 
@@ -91,12 +75,17 @@ function initLoginForm() {
         loginMsg.style.color = 'green';
 
         setTimeout(() => {
-          window.location.href = '/dashboard';
+          // Redirection en fonction du rôle (pour l’instant MOA vers /dashboard)
+          if (data.user.role === 'MOA') {
+            window.location.href = '/dashboard';
+          } else {
+            // Plus tard : gérer Architecte, BET, etc.
+            window.location.href = '/dashboard';
+          }
         }, 700);
-
       } catch (err) {
         console.error(err);
-        loginMsg.textContent = 'Erreur serveur.';
+        loginMsg.textContent = err.message;
         loginMsg.style.color = 'red';
       }
     });
@@ -118,93 +107,57 @@ function initLoginForm() {
           body: JSON.stringify({ email, password, role })
         });
 
-        const data = await res.json();
-
         if (!res.ok) {
-          registerMsg.textContent = data.error || 'Erreur lors de la création du compte.';
-          registerMsg.style.color = 'red';
-          return;
+          const error = await res.json().catch(() => ({}));
+          throw new Error(error.error || 'Erreur lors de la création du compte');
         }
 
-        registerMsg.textContent = 'Compte créé avec succès. Vous pouvez vous connecter.';
+        registerMsg.textContent = 'Compte créé. Vous pouvez vous connecter.';
         registerMsg.style.color = 'green';
         registerForm.reset();
-
       } catch (err) {
         console.error(err);
-        registerMsg.textContent = 'Erreur serveur.';
+        registerMsg.textContent = err.message;
         registerMsg.style.color = 'red';
       }
     });
   }
 }
 
-// -------- DASHBOARD : Liste & création de projets --------
-async function loadProjects() {
-  const listContainer = document.getElementById('projects-list');
-  if (!listContainer) return;
+// =====================
+// Page DASHBOARD (MOA)
+// =====================
 
-  const token = requireLogin();
-  if (!token) return;
+function initDashboardPage() {
+  updateHeaderUserEmail();
+  loadProjects();
 
-  try {
-    const res = await fetch('/api/projects', {
-      headers: {
-        'Authorization': 'Bearer ' + token
-      }
-    });
+  const form = document.getElementById('create-project-form');
+  const msg = document.getElementById('create-project-message');
 
-    if (!res.ok) {
-      listContainer.innerHTML = '<p>Erreur lors du chargement des projets.</p>';
-      return;
-    }
-
-    const projects = await res.json();
-
-    if (projects.length === 0) {
-      listContainer.innerHTML = '<p>Aucun projet pour le moment. Créez votre premier chantier ci-dessus.</p>';
-      return;
-    }
-
-    listContainer.innerHTML = '';
-
-    projects.forEach(p => {
-      const div = document.createElement('div');
-      div.className = 'project-item';
-      div.innerHTML = `
-        <a href="/project?id=${p.id}">${p.name}</a>
-        <div><small>${p.location} • Statut : ${p.status}</small></div>
-      `;
-      listContainer.appendChild(div);
-    });
-
-  } catch (err) {
-    console.error(err);
-    listContainer.innerHTML = '<p>Erreur réseau lors du chargement des projets.</p>';
-  }
-}
-
-function initProjectForm() {
-  const form = document.getElementById('project-form');
-  const message = document.getElementById('form-message');
   if (!form) return;
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    message.textContent = '';
+    msg.textContent = '';
 
-    const token = requireLogin();
-    if (!token) return;
+    const token = getToken();
+    if (!token) {
+      window.location.href = '/';
+      return;
+    }
 
-    const name = document.getElementById('name').value.trim();
-    const location = document.getElementById('location').value.trim();
-    const type = document.getElementById('type').value.trim();
-    const surface = document.getElementById('surface').value;
-    const budget = document.getElementById('budget').value;
+    const payload = {
+      name: document.getElementById('project-name-input').value.trim(),
+      location: document.getElementById('project-location-input').value.trim(),
+      type: document.getElementById('project-type-input').value.trim(),
+      surface: document.getElementById('project-surface-input').value || null,
+      budget: document.getElementById('project-budget-input').value || null,
+    };
 
-    if (!name || !location) {
-      message.textContent = 'Merci de remplir au minimum le nom et la localisation.';
-      message.style.color = 'red';
+    if (!payload.name || !payload.location) {
+      msg.textContent = 'Nom et localisation sont obligatoires.';
+      msg.style.color = 'red';
       return;
     }
 
@@ -213,93 +166,282 @@ function initProjectForm() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token
+          'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ name, location, type, surface, budget })
+        body: JSON.stringify(payload)
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
-        message.textContent = data.error || 'Erreur lors de la création du projet.';
-        message.style.color = 'red';
-        return;
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.error || 'Erreur lors de la création du projet');
       }
 
-      message.textContent = 'Projet créé avec succès !';
-      message.style.color = 'green';
+      const project = await res.json();
+      msg.textContent = 'Projet créé avec succès.';
+      msg.style.color = 'green';
       form.reset();
-      loadProjects();
+      appendProjectToList(project);
 
     } catch (err) {
       console.error(err);
-      message.textContent = 'Erreur réseau.';
-      message.style.color = 'red';
+      msg.textContent = err.message;
+      msg.style.color = 'red';
     }
   });
 }
 
-// -------- PAGE PROJET : Détail --------
-function getQueryParam(name) {
-  const params = new URLSearchParams(window.location.search);
-  return params.get(name);
-}
+async function loadProjects() {
+  const token = getToken();
+  if (!token) {
+    window.location.href = '/';
+    return;
+  }
 
-async function loadProjectDetail() {
-  const id = getQueryParam('id');
-  if (!id) return;
+  const list = document.getElementById('projects-list');
+  if (!list) return;
 
-  const token = requireLogin();
-  if (!token) return;
+  list.innerHTML = '<p>Chargement des projets...</p>';
 
   try {
-    const res = await fetch(`/api/projects/${id}`, {
+    const res = await fetch('/api/projects', {
       headers: {
-        'Authorization': 'Bearer ' + token
+        'Authorization': `Bearer ${token}`
       }
     });
 
-    const data = await res.json();
-
     if (!res.ok) {
-      document.getElementById('project-name').textContent = data.error || 'Projet introuvable';
+      throw new Error('Erreur lors du chargement des projets');
+    }
+
+    const projects = await res.json();
+
+    if (!projects.length) {
+      list.innerHTML = '<p>Aucun projet pour le moment.</p>';
       return;
     }
 
-    const p = data;
-
-    document.getElementById('project-name').textContent = p.name;
-    document.getElementById('project-id').textContent = p.id;
-    document.getElementById('project-location').textContent = p.location || '-';
-    document.getElementById('project-type').textContent = p.type || '-';
-    document.getElementById('project-surface').textContent = p.surface || '-';
-    document.getElementById('project-budget').textContent = p.budget || '-';
-    document.getElementById('project-status').textContent = p.status || '-';
-    document.getElementById('project-createdAt').textContent =
-      p.created_at ? new Date(p.created_at).toLocaleString('fr-FR') : '-';
-
+    list.innerHTML = '';
+    projects.forEach(appendProjectToList);
   } catch (err) {
     console.error(err);
-    document.getElementById('project-name').textContent = 'Erreur de chargement';
+    list.innerHTML = '<p>Erreur lors du chargement des projets.</p>';
   }
 }
 
-// -------- INIT --------
+function appendProjectToList(project) {
+  const list = document.getElementById('projects-list');
+  if (!list) return;
+
+  const item = document.createElement('div');
+  item.className = 'project-item';
+
+  const link = document.createElement('a');
+  link.href = `/project?id=${project.id}`;
+  link.textContent = project.name;
+
+  const meta = document.createElement('p');
+  meta.textContent = `${project.location} • Statut : ${project.status || 'En cours'}`;
+
+  item.appendChild(link);
+  item.appendChild(meta);
+  list.appendChild(item);
+}
+
+// =====================
+// Page PROJECT (détail + édition MOA + bouton "terminé")
+// =====================
+
+function getProjectIdFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('id');
+}
+
+async function loadProjectDetail() {
+  updateHeaderUserEmail();
+
+  const projectId = getProjectIdFromUrl();
+  if (!projectId) return;
+
+  const token = getToken();
+  if (!token) {
+    window.location.href = '/';
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/projects/${projectId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error('Erreur lors du chargement du projet');
+    }
+
+    const project = await res.json();
+
+    // Affichage des infos
+    document.getElementById('project-name').textContent = project.name;
+    document.getElementById('project-id').textContent = project.id;
+    document.getElementById('project-location').textContent = project.location;
+    document.getElementById('project-type').textContent = project.type || '-';
+    document.getElementById('project-surface').textContent = project.surface || '-';
+    document.getElementById('project-budget').textContent = project.budget || '-';
+    document.getElementById('project-status').textContent = project.status || '-';
+    document.getElementById('project-created-at').textContent = project.created_at
+      ? new Date(project.created_at).toLocaleString()
+      : '-';
+
+    // Pré-remplir le formulaire d’édition
+    const editName = document.getElementById('edit-name');
+    const editLocation = document.getElementById('edit-location');
+    const editType = document.getElementById('edit-type');
+    const editSurface = document.getElementById('edit-surface');
+    const editBudget = document.getElementById('edit-budget');
+    const editStatus = document.getElementById('edit-status');
+
+    if (editName) editName.value = project.name || '';
+    if (editLocation) editLocation.value = project.location || '';
+    if (editType) editType.value = project.type || '';
+    if (editSurface) editSurface.value = project.surface || '';
+    if (editBudget) editBudget.value = project.budget || '';
+    if (editStatus && project.status) editStatus.value = project.status;
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function initEditProjectForm() {
+  const form = document.getElementById('edit-project-form');
+  if (!form) return;
+
+  const messageEl = document.getElementById('edit-message');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const projectId = getProjectIdFromUrl();
+    if (!projectId) return;
+
+    const token = getToken();
+    if (!token) {
+      window.location.href = '/';
+      return;
+    }
+
+    const payload = {
+      name: document.getElementById('edit-name').value.trim(),
+      location: document.getElementById('edit-location').value.trim(),
+      type: document.getElementById('edit-type').value.trim(),
+      surface: document.getElementById('edit-surface').value || null,
+      budget: document.getElementById('edit-budget').value || null,
+      status: document.getElementById('edit-status').value
+    };
+
+    try {
+      const res = await fetch(`/api/projects/${projectId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.error || 'Erreur lors de la mise à jour');
+      }
+
+      const updatedProject = await res.json();
+
+      // Met à jour l’affichage
+      document.getElementById('project-name').textContent = updatedProject.name;
+      document.getElementById('project-id').textContent = updatedProject.id;
+      document.getElementById('project-location').textContent = updatedProject.location;
+      document.getElementById('project-type').textContent = updatedProject.type || '-';
+      document.getElementById('project-surface').textContent = updatedProject.surface || '-';
+      document.getElementById('project-budget').textContent = updatedProject.budget || '-';
+      document.getElementById('project-status').textContent = updatedProject.status || '-';
+
+      messageEl.textContent = 'Projet mis à jour avec succès.';
+      messageEl.style.color = 'green';
+    } catch (err) {
+      console.error(err);
+      messageEl.textContent = err.message;
+      messageEl.style.color = 'red';
+    }
+  });
+}
+
+// ⭐ Bouton "Marquer comme terminé"
+function initMarkCompleteButton() {
+  const btn = document.getElementById('mark-complete-btn');
+  if (!btn) return;
+
+  btn.addEventListener('click', async () => {
+    const token = getToken();
+    if (!token) {
+      window.location.href = '/';
+      return;
+    }
+
+    const projectId = getProjectIdFromUrl();
+    if (!projectId) return;
+
+    try {
+      const res = await fetch(`/api/projects/${projectId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: 'Complet' })
+      });
+
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.error || 'Erreur lors de la mise à jour du statut');
+      }
+
+      const updatedProject = await res.json();
+      document.getElementById('project-status').textContent = updatedProject.status || '-';
+
+      const msg = document.getElementById('edit-message');
+      if (msg) {
+        msg.textContent = 'Projet marqué comme complet.';
+        msg.style.color = 'green';
+      }
+    } catch (err) {
+      console.error(err);
+      const msg = document.getElementById('edit-message');
+      if (msg) {
+        msg.textContent = err.message;
+        msg.style.color = 'red';
+      }
+    }
+  });
+}
+
+// =====================
+// Initialisation globale
+// =====================
+
 document.addEventListener('DOMContentLoaded', () => {
-  const page = getCurrentPage();
+  const body = document.body;
+  const page = body.getAttribute('data-page');
 
   if (page === 'login') {
-    initLoginForm();
+    initLoginPage();
   } else if (page === 'dashboard') {
-    requireLogin();
-    displayCurrentUserEmail();
-    loadProjects();
-    initProjectForm();
+    initDashboardPage();
   } else if (page === 'project') {
-    requireLogin();
-    displayCurrentUserEmail();
     loadProjectDetail();
-  } else if (page === 'confidentialite') {
-    displayCurrentUserEmail();
+    initEditProjectForm();
+    initMarkCompleteButton(); // ⭐ bouton "terminé"
+  } else {
+    updateHeaderUserEmail();
   }
 });
