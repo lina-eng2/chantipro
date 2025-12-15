@@ -66,8 +66,12 @@ exports.login = async (req, res) => {
     });
 
   } catch (err) {
-  console.error("REGISTER ERROR:", err);
-  return res.status(500).json({ error: "Erreur serveur", details: err.message });
+  console.error("REGISTER ERROR 👉", err);
+  res.status(500).json({
+    error: "Erreur serveur",
+    details: err.message,
+  });
   }
+
 };
 
