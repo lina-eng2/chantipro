@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Tableau de bord - Gestion de chantiers</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tableau de bord - TETRAGON</title>
+  <link rel="stylesheet" href="/style.css" />
 </head>
+
 <body data-page="dashboard">
   <header>
     <div class="header-left">
       <h1>Tableau de bord - Projets de chantier</h1>
     </div>
+
     <div class="header-right">
       <span id="current-user-email"></span>
       <button type="button" class="btn-secondary" onclick="logout()">Déconnexion</button>
     </div>
+
     <nav>
       <a href="/dashboard">Tableau de bord</a>
       <a href="/confidentialite">Politique de confidentialité</a>
@@ -21,52 +25,59 @@
   </header>
 
   <main>
+    <!-- Création projet -->
     <section class="card">
       <h2>Créer un nouveau projet</h2>
-      <form id="project-form">
+
+      <form id="create-project-form">
         <div class="form-group">
-          <label for="name">Nom du projet *</label>
-          <input type="text" id="name" required>
+          <label for="project-name-input">Nom du projet *</label>
+          <input type="text" id="project-name-input" required />
         </div>
 
         <div class="form-group">
-          <label for="location">Localisation *</label>
-          <input type="text" id="location" required>
+          <label for="project-location-input">Localisation *</label>
+          <input type="text" id="project-location-input" required />
         </div>
 
         <div class="form-group">
-          <label for="type">Type de construction</label>
-          <input type="text" id="type" placeholder="Ex : Immeuble R+3, Villa, Entrepôt...">
+          <label for="project-type-input">Type de construction</label>
+          <input
+            type="text"
+            id="project-type-input"
+            placeholder="Ex : Immeuble R+3, Villa, Entrepôt..."
+          />
         </div>
 
         <div class="form-group">
-          <label for="surface">Surface (m²)</label>
-          <input type="number" id="surface" min="0">
+          <label for="project-surface-input">Surface (m²)</label>
+          <input type="number" id="project-surface-input" min="0" />
         </div>
 
         <div class="form-group">
-          <label for="budget">Budget prévisionnel (€)</label>
-          <input type="number" id="budget" min="0">
+          <label for="project-budget-input">Budget prévisionnel (€)</label>
+          <input type="number" id="project-budget-input" min="0" />
         </div>
 
-        <button type="submit">Créer le projet</button>
-        <p id="form-message" class="message"></p>
+        <button type="submit" class="btn-primary">Créer le projet</button>
+        <p id="create-project-message" class="form-message"></p>
       </form>
     </section>
 
+    <!-- Liste projets -->
     <section class="card">
       <h2>Mes projets</h2>
       <div id="projects-list">
-        <!-- Liste des projets chargée par app.js -->
+        <!-- Rempli par app.js -->
       </div>
     </section>
   </main>
 
   <footer>
-    <p>&copy; 2025 - Application de gestion de chantiers</p>
+    <p>&copy; 2025 - TETRAGON</p>
     <a href="/confidentialite">Politique de confidentialité</a>
   </footer>
 
-  <script src="app.js"></script>
+  <script src="/app.js"></script>
 </body>
 </html>
