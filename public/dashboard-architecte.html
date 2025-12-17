@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard Architecte - TETRAGON</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+
+<body data-page="dashboard-architecte">
+<header>
+  <div class="header-left">
+    <h1>Dashboard Architecte</h1>
+  </div>
+
+  <div class="header-right">
+    <span id="current-user-email"></span>
+    <button type="button" class="btn-secondary" onclick="logout()">Déconnexion</button>
+  </div>
+
+  <nav>
+    <a href="/dashboard/architecte">Dashboard</a>
+    <a href="/confidentialite">Politique de confidentialité</a>
+  </nav>
+</header>
+
+<main>
+  <section class="card">
+    <h2>Choisir un projet</h2>
+    <select id="archi-project-select"></select>
+  </section>
+
+  <section class="card">
+    <h2>Déposer un document</h2>
+
+    <form id="archi-upload-form">
+      <div class="form-group">
+        <label for="archi-doc-type">Type</label>
+        <select id="archi-doc-type">
+          <option value="plan">Plan</option>
+          <option value="convention">Convention</option>
+          <option value="rapport">Rapport</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="archi-file">Fichier</label>
+        <input type="file" id="archi-file" required />
+      </div>
+
+      <button type="submit" class="btn-primary">Uploader</button>
+      <p id="archi-upload-msg" class="form-message"></p>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>Documents du projet</h2>
+    <div id="archi-doc-list"></div>
+  </section>
+</main>
+
+<footer>
+  <p>&copy; 2025 - TETRAGON</p>
+  <a href="/confidentialite">Politique de confidentialité</a>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>

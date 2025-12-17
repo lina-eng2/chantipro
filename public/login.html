@@ -2,16 +2,18 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Connexion - Gestion de chantiers</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Connexion - TETRAGON</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
+
 <body data-page="login">
-  
 
 <header class="header-top">
   <div class="brand">
     <h1>TETRAGON</h1>
-    <p class="subtitle">Plateforme intelligente de gestion de projets de construction</p>
+    <p class="subtitle">
+      Plateforme intelligente de gestion de projets de construction
+    </p>
   </div>
 
   <nav class="header-nav">
@@ -19,62 +21,73 @@
   </nav>
 </header>
 
-  
+<main>
 
-  <main>
-    <section class="card">
-      <h2>Connexion</h2>
-      <form id="login-form">
-        <div class="form-group">
-          <label for="login-email">Email</label>
-          <input type="email" id="login-email" required>
-        </div>
+  <!-- ================= CONNEXION ================= -->
+  <section class="card">
+    <h2>Connexion</h2>
 
-        <div class="form-group">
-          <label for="login-password">Mot de passe</label>
-          <input type="password" id="login-password" required>
-        </div>
+    <form id="login-form">
+      <div class="form-group">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" required />
+      </div>
 
-        <button type="submit">Se connecter</button>
-        <p id="login-message" class="message"></p>
-      </form>
-    </section>
+      <div class="form-group">
+        <label for="login-password">Mot de passe</label>
+        <input type="password" id="login-password" required />
+      </div>
 
-    <section class="card">
-      <h2>Créer un compte</h2>
-      <p>Pour un vrai usage, la création de compte pourrait être réservée à l’administrateur. Ici, c’est simplifié pour le projet.</p>
-      <form id="register-form">
-        <div class="form-group">
-          <label for="register-email">Email</label>
-          <input type="email" id="register-email" required>
-        </div>
+      <button type="submit" class="btn-primary">Se connecter</button>
+      <p id="login-message" class="message"></p>
+    </form>
+  </section>
 
-        <div class="form-group">
-          <label for="register-password">Mot de passe</label>
-          <input type="password" id="register-password" required>
-        </div>
+  <!-- ================= INSCRIPTION ================= -->
+  <section class="card">
+    <h2>Créer un compte</h2>
 
-        <div class="form-group">
-          <label for="register-role">Rôle</label>
-          <select id="register-role">
-            <option value="MOA">Maître d'Ouvrage (MOA)</option>
-            <option value="MOE">Maître d'Œuvre (MOE)</option>
-            <option value="Architecte">Architecte</option>
-            <option value="BET">BET</option>
-          </select>
-        </div>
+    <p class="hint">
+      Pour un vrai usage, la création de compte serait réservée à
+      l’administrateur. Ici, c’est simplifié pour le projet.
+    </p>
 
-        <button type="submit">Créer le compte</button>
-        <p id="register-message" class="message"></p>
-      </form>
-    </section>
-  </main>
+    <form id="register-form">
+      <div class="form-group">
+        <label for="register-email">Email</label>
+        <input type="email" id="register-email" required />
+      </div>
 
-  <footer>
-    <p>&copy; 2025 - Application de gestion de chantiers</p>
-    <a href="/confidentialite">Politique de confidentialité</a>
-  </footer>
+      <div class="form-group">
+        <label for="register-password">Mot de passe</label>
+        <input type="password" id="register-password" required />
+      </div>
 
-  <script src="app.js"></script>
+      <div class="form-group">
+        <label for="register-role">Rôle</label>
+        <select id="register-role" required>
+          <option value="MOA">Maître d'Ouvrage (MOA)</option>
+          <option value="ARCHITECTE">Architecte</option>
+          <option value="AMOA">AMOA</option>
+          <option value="BET">BET</option>
+          <option value="BCT">Bureau de contrôle technique (BCT)</option>
+          <option value="LABO">Laboratoire technique</option>
+          <option value="TOPOGRAPHE">Topographe</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn-primary">Créer le compte</button>
+      <p id="register-message" class="message"></p>
+    </form>
+  </section>
+
+</main>
+
+<footer>
+  <p>&copy; 2025 - TETRAGON</p>
+  <a href="/confidentialite">Politique de confidentialité</a>
+</footer>
+
+<script src="/app.js"></script>
 </body>
 </html>

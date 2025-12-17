@@ -1,18 +1,14 @@
--- On supprime d'abord les tables si elles existent (pour une création initiale en local)
-DROP TABLE IF EXISTS projects;
-DROP TABLE IF EXISTS users;
-
--- Table des utilisateurs
-CREATE TABLE users (
+-- USERS
+CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   email VARCHAR(255) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
-  role VARCHAR(50) NOT NULL DEFAULT 'MOA',
+  role VARCHAR(50) NOT NULL,
   created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Table des projets
-CREATE TABLE projects (
+-- PROJECTS
+CREATE TABLE IF NOT EXISTS projects (
   id SERIAL PRIMARY KEY,
   owner_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   name VARCHAR(255) NOT NULL,
@@ -20,6 +16,16 @@ CREATE TABLE projects (
   type VARCHAR(100),
   surface NUMERIC,
   budget NUMERIC,
-  status VARCHAR(50) DEFAULT 'En cours', -- ⭐ statut par défaut
+  status VARCHAR(50) DEFAULT 'En cours',
   created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- MEMBERSHIP (qui a accès à quel projet, avec quel rôle)
+CREATE TABLE IF NOT EXISTS project_members (
+  id SERIAL PRIMARY KEY,
+  project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  role_in_project VARCHAR(50) NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW(),
+  UNIQUE(project_id, user_id)
 );

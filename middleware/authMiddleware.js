@@ -1,21 +1,25 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
-function authMiddleware(req, res, next) {
-  const header = req.headers.authorization;
+function authRequired(req, res, next) {
+  const header = req.headers.authorization || "";
+  const token = header.startsWith("Bearer ") ? header.slice(7) : null;
 
-  if (!header) {
-    return res.status(401).json({ error: 'Token manquant' });
-  }
-
-  const token = header.split(" ")[1];
+  if (!token) return res.status(401).json({ error: "Token manquant." });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // { id, email, role }
-    next();
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    return next();
   } catch (e) {
-    return res.status(403).json({ error: 'Token invalide ou expiré' });
+    return res.status(401).json({ error: "Token invalide." });
   }
 }
 
-module.exports = authMiddleware;
+function allowRoles(...roles) {
+  return (req, res, next) => {
+    if (!req.user) return res.status(401).json({ error: "Non authentifié." });
+    if (!roles.includes(req.user.role)) return res.status(403).json({ error: "Accès refusé." });
+    return next();
+  };
+}
+
+module.exports = { authRequired, allowRoles };

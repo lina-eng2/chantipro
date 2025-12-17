@@ -1,142 +1,152 @@
 const pool = require('../db/db');
 
-// Récupérer tous les projets du MOA connecté
-exports.getProjects = async (req, res) => {
+// helper: check membership
+async function isMember(projectId, userId) {
+  const r = await pool.query(
+    "SELECT 1 FROM project_members WHERE project_id=$1 AND user_id=$2",
+    [projectId, userId]
+  );
+  return r.rows.length > 0;
+}
+
+exports.listProjects = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const result = await pool.query(
-      `SELECT id, name, location, type, surface, budget, status, created_at
-       FROM projects
-       WHERE owner_id = $1
-       ORDER BY created_at DESC`,
-      [userId]
-    );
+    // MOA: projets dont il est owner + tous projets où il est membre
+    const result = await pool.query(`
+      SELECT p.*
+      FROM projects p
+      WHERE p.owner_id = $1
+      UNION
+      SELECT p.*
+      FROM projects p
+      JOIN project_members m ON m.project_id = p.id
+      WHERE m.user_id = $1
+      ORDER BY id DESC
+    `, [userId]);
 
-    return res.json(result.rows);
+    res.json(result.rows);
   } catch (err) {
-    console.error('Erreur getProjects:', err);
-    return res.status(500).json({ error: 'Erreur serveur.' });
+    console.error("LIST PROJECTS ERROR 👉", err);
+    res.status(500).json({ error: "Erreur serveur", details: err.message });
   }
 };
 
-// Créer un nouveau projet (MOA)
 exports.createProject = async (req, res) => {
+  const { name, location, type, surface, budget } = req.body;
+
   try {
-    const userId = req.user.id;
-    const userRole = req.user.role;
-
-    if (userRole !== 'MOA') {
-      return res.status(403).json({ error: 'Seul le MOA peut créer un projet.' });
+    // seul MOA crée un projet
+    if (req.user.role !== "MOA") {
+      return res.status(403).json({ error: "Seul le MOA peut créer un projet." });
     }
-
-    const { name, location, type, surface, budget } = req.body;
 
     if (!name || !location) {
-      return res.status(400).json({ error: 'Nom et localisation sont obligatoires.' });
+      return res.status(400).json({ error: "Nom et localisation obligatoires." });
     }
 
     const result = await pool.query(
-      `INSERT INTO projects (owner_id, name, location, type, surface, budget)
-       VALUES ($1,$2,$3,$4,$5,$6)
+      `INSERT INTO projects (owner_id, name, location, type, surface, budget, status)
+       VALUES ($1,$2,$3,$4,$5,$6,'En cours')
        RETURNING *`,
-      [userId, name, location, type || null, surface || null, budget || null]
+      [req.user.id, name, location, type || null, surface || null, budget || null]
     );
 
-    return res.status(201).json(result.rows[0]);
+    res.json(result.rows[0]);
   } catch (err) {
-    console.error('Erreur createProject:', err);
-    return res.status(500).json({ error: 'Erreur serveur.' });
+    console.error("CREATE PROJECT ERROR 👉", err);
+    res.status(500).json({ error: "Erreur serveur", details: err.message });
   }
 };
 
-// Récupérer le détail d’un projet
-exports.getProjectById = async (req, res) => {
+exports.getProject = async (req, res) => {
   try {
-    const projectId = req.params.id;
+    const projectId = Number(req.params.id);
     const userId = req.user.id;
 
-    const result = await pool.query(
-      `SELECT id, owner_id, name, location, type, surface, budget, status, created_at
-       FROM projects
-       WHERE id = $1`,
-      [projectId]
-    );
+    const proj = await pool.query("SELECT * FROM projects WHERE id=$1", [projectId]);
+    if (proj.rows.length === 0) return res.status(404).json({ error: "Projet introuvable." });
 
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: 'Projet introuvable.' });
-    }
+    const project = proj.rows[0];
 
-    const project = result.rows[0];
+    const member = await isMember(projectId, userId);
+    const isOwner = project.owner_id === userId;
 
-    // Pour l’instant, seul le propriétaire peut voir
-    if (project.owner_id !== userId) {
-      return res.status(403).json({ error: 'Accès non autorisé à ce projet.' });
-    }
+    if (!isOwner && !member) return res.status(403).json({ error: "Accès refusé." });
 
-    return res.json(project);
+    res.json(project);
   } catch (err) {
-    console.error('Erreur getProjectById:', err);
-    return res.status(500).json({ error: 'Erreur serveur.' });
+    console.error("GET PROJECT ERROR 👉", err);
+    res.status(500).json({ error: "Erreur serveur", details: err.message });
   }
 };
 
-// ⭐ Mise à jour complète d’un projet (MOA propriétaire)
 exports.updateProject = async (req, res) => {
   try {
-    const projectId = req.params.id;
+    const projectId = Number(req.params.id);
     const userId = req.user.id;
-    const userRole = req.user.role;
+    const { name, location, type, surface, budget, status } = req.body;
 
-    // Seul le MOA peut modifier son projet
-    if (userRole !== 'MOA') {
-      return res.status(403).json({ error: 'Seul le MOA peut modifier le projet.' });
-    }
+    const proj = await pool.query("SELECT * FROM projects WHERE id=$1", [projectId]);
+    if (proj.rows.length === 0) return res.status(404).json({ error: "Projet introuvable." });
+    const project = proj.rows[0];
 
-    const {
-      name,
-      location,
-      type,
-      surface,
-      budget,
-      status,
-    } = req.body;
-
-    // Statuts autorisés
-    const allowedStatus = ['Brouillon', 'En cours', 'Complet'];
-    if (status && !allowedStatus.includes(status)) {
-      return res.status(400).json({ error: 'Statut invalide.' });
+    // seul owner (MOA) peut modifier fiche projet + status
+    if (project.owner_id !== userId) {
+      return res.status(403).json({ error: "Seul le MOA propriétaire peut modifier le projet." });
     }
 
     const result = await pool.query(
       `UPDATE projects
-       SET name = $1,
-           location = $2,
-           type = $3,
-           surface = $4,
-           budget = $5,
-           status = $6
-       WHERE id = $7 AND owner_id = $8
+       SET name=$1, location=$2, type=$3, surface=$4, budget=$5, status=$6
+       WHERE id=$7
        RETURNING *`,
       [
-        name,
-        location,
-        type || null,
-        surface || null,
-        budget || null,
-        status || 'En cours',
-        projectId,
-        userId,
+        name ?? project.name,
+        location ?? project.location,
+        type ?? project.type,
+        surface ?? project.surface,
+        budget ?? project.budget,
+        status ?? project.status,
+        projectId
       ]
     );
 
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: 'Projet introuvable ou non autorisé.' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("UPDATE PROJECT ERROR 👉", err);
+    res.status(500).json({ error: "Erreur serveur", details: err.message });
+  }
+};
+
+// MOA invite un user à un projet (par email) avec role_in_project
+exports.inviteMember = async (req, res) => {
+  try {
+    const projectId = Number(req.params.id);
+    const { email, role_in_project } = req.body;
+
+    const proj = await pool.query("SELECT * FROM projects WHERE id=$1", [projectId]);
+    if (proj.rows.length === 0) return res.status(404).json({ error: "Projet introuvable." });
+    if (proj.rows[0].owner_id !== req.user.id) {
+      return res.status(403).json({ error: "Seul le MOA propriétaire peut inviter." });
     }
 
-    return res.json(result.rows[0]);
+    const u = await pool.query("SELECT id, role FROM users WHERE email=$1", [email]);
+    if (u.rows.length === 0) return res.status(404).json({ error: "Utilisateur introuvable." });
+
+    const user = u.rows[0];
+
+    await pool.query(
+      `INSERT INTO project_members (project_id, user_id, role_in_project)
+       VALUES ($1,$2,$3)
+       ON CONFLICT (project_id, user_id) DO NOTHING`,
+      [projectId, user.id, role_in_project || user.role]
+    );
+
+    res.json({ ok: true });
   } catch (err) {
-    console.error('Erreur updateProject:', err);
-    return res.status(500).json({ error: 'Erreur serveur.' });
+    console.error("INVITE ERROR 👉", err);
+    res.status(500).json({ error: "Erreur serveur", details: err.message });
   }
 };
